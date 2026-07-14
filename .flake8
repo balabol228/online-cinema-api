@@ -1,0 +1,7 @@
+[flake8]
+max-line-length = 120
+exclude = .git,__pycache__,env,venv,.venv,alembic
+per-file-ignores =
+    app/models/__init__.py:F401
+    app/schemas/__init__.py:F401
+    app/api/v1/endpoints/__init__.py:F401
