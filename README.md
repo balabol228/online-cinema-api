@@ -1,107 +1,108 @@
 # Online Cinema API
 
-REST API для сервісу онлайн-кінотеатру. Проєкт реалізує обрану підмножину функцій
-повної специфікації Online Cinema — з акцентом на якість (тести, документація),
-а не на кількість фіч.
+A REST API for an online cinema service. This project implements a selected subset of
+the full Online Cinema specification — focused on quality (tests, documentation)
+rather than quantity of features.
 
-## Обрані функції (7 з 6-8)
+## Selected Features (7 out of 6-8 required)
 
-| # | Функція | Опис |
-|---|---------|------|
-| 1 | Автентифікація | Реєстрація, логін, JWT access/refresh токени |
-| 2 | Ролі та дозволи | User / Moderator / Admin, захист ендпоінтів |
-| 3 | Каталог фільмів | CRUD для адміна, перегляд/фільтри/пагінація для всіх |
-| 4 | Кошик покупок | Додавання/видалення фільмів |
-| 5 | Замовлення та оплата | Stripe Checkout + webhook |
-| 6 | Лайки, рейтинги, коментарі | Вкладені відповіді на коментарі |
-| 7 | Обране | Список "подивитись пізніше" |
+| # | Feature | Description |
+|---|---------|--------------|
+| 1 | Authentication | Registration, login, JWT access/refresh tokens |
+| 2 | Roles & Permissions | User / Moderator / Admin, protected endpoints |
+| 3 | Movie Catalog | Admin CRUD, public browsing with filters/pagination |
+| 4 | Shopping Cart | Add/remove movies |
+| 5 | Orders & Payment | Stripe Checkout + webhook |
+| 6 | Likes, Ratings & Comments | Nested comment replies |
+| 7 | Favorites | "Watch later" list |
 
-## Стек технологій
+## Tech Stack
 
-- **FastAPI** — веб-фреймворк, автоматична Swagger/ReDoc документація
-- **SQLAlchemy 2.0 (async)** + **asyncpg** — робота з PostgreSQL
-- **Alembic** — міграції БД
-- **Pydantic v2** — валідація даних
-- **JWT (python-jose)** — автентифікація (access + refresh токени)
-- **Passlib/bcrypt** — хешування паролів
-- **Stripe** — оплата замовлень
-- **Docker Compose** — Postgres, Redis, MailHog, застосунок
-- **pytest + pytest-asyncio + httpx** — тести (юніт + інтеграційні)
+- **FastAPI** — web framework with automatic Swagger/ReDoc documentation
+- **SQLAlchemy 2.0 (async)** + **asyncpg** — PostgreSQL access layer
+- **Alembic** — database migrations
+- **Pydantic v2** — data validation
+- **JWT (python-jose)** — authentication (access + refresh tokens)
+- **Passlib/bcrypt** — password hashing
+- **Stripe** — order payment processing
+- **Docker Compose** — Postgres, Redis, MailHog, and the app itself
+- **pytest + pytest-asyncio + httpx** — unit and integration tests
 
-## Швидкий старт
+## Quick Start
 
-### Через Docker
+### Using Docker
 
 ```bash
 cp .env.sample .env
 docker compose up --build
 ```
 
-Застосунок буде доступний на `http://localhost:8000`.
+The app will be available at `http://localhost:8000`.
 
-### Локально (без Docker)
+### Running Locally (without Docker)
 
-```bash
+``````bash
 python -m venv venv
 venv\Scripts\activate
 pip install -r requirements.txt
 cp .env.sample .env
 alembic upgrade head
 uvicorn app.main:app --reload
-```
+``````
 
-## Документація API
+## API Documentation
 
 - **Swagger UI:** http://localhost:8000/docs
 - **ReDoc:** http://localhost:8000/redoc
 
-Кожен кастомний ендпоінт містить опис параметрів, кодів відповіді та бізнес-логіки.
+Every custom endpoint includes a description of its parameters, response codes,
+and business logic directly in Swagger.
 
-### Реалізовані ендпоінти
+### Implemented Endpoints
 
-| Метод | Шлях | Опис |
-|-------|------|------|
-| POST | `/api/v1/auth/register` | Реєстрація нового користувача |
-| POST | `/api/v1/auth/login` | Логін, повертає access/refresh токени |
-| POST | `/api/v1/auth/refresh` | Оновлення access token |
-| GET | `/api/v1/users/me` | Профіль поточного користувача |
-| GET | `/api/v1/movies` | Каталог фільмів: пагінація, фільтри, сортування |
-| GET | `/api/v1/movies/{id}` | Деталі фільму |
-| POST | `/api/v1/movies` | Створити фільм (Moderator/Admin) |
-| PATCH | `/api/v1/movies/{id}` | Оновити фільм (Moderator/Admin) |
-| DELETE | `/api/v1/movies/{id}` | Видалити фільм (тільки Admin) |
-| POST | `/api/v1/genres`, `/api/v1/actors` | Наповнення довідників |
-| GET/POST/DELETE | `/api/v1/cart`, `/api/v1/cart/items/{id}` | Кошик покупок |
-| POST | `/api/v1/orders` | Оформити замовлення (Stripe Checkout) |
-| GET | `/api/v1/orders`, `/api/v1/orders/{id}` | Історія та деталі замовлень |
+| Method | Path | Description |
+|--------|------|--------------|
+| POST | `/api/v1/auth/register` | Register a new user |
+| POST | `/api/v1/auth/login` | Log in, returns access/refresh tokens |
+| POST | `/api/v1/auth/refresh` | Refresh the access token |
+| GET | `/api/v1/users/me` | Get current user's profile |
+| GET | `/api/v1/movies` | Browse movie catalog: pagination, filters, sorting |
+| GET | `/api/v1/movies/{id}` | Movie details |
+| POST | `/api/v1/movies` | Create a movie (Moderator/Admin) |
+| PATCH | `/api/v1/movies/{id}` | Update a movie (Moderator/Admin) |
+| DELETE | `/api/v1/movies/{id}` | Delete a movie (Admin only) |
+| POST | `/api/v1/genres`, `/api/v1/actors` | Populate reference data |
+| GET/POST/DELETE | `/api/v1/cart`, `/api/v1/cart/items/{id}` | Shopping cart |
+| POST | `/api/v1/orders` | Checkout (Stripe Checkout session) |
+| GET | `/api/v1/orders`, `/api/v1/orders/{id}` | Order history and details |
 | POST | `/api/v1/payments/webhook` | Stripe webhook |
-| POST | `/api/v1/movies/{id}/like` | Лайк/анлайк фільму |
-| POST/GET | `/api/v1/movies/{id}/rating` | Оцінити / переглянути рейтинг |
-| POST/GET | `/api/v1/movies/{id}/comments` | Коментарі з вкладеними відповідями |
-| POST | `/api/v1/movies/{id}/favorite` | Додати/прибрати з обраного |
-| GET | `/api/v1/favorites` | Список обраних фільмів |
+| POST | `/api/v1/movies/{id}/like` | Like/unlike a movie |
+| POST/GET | `/api/v1/movies/{id}/rating` | Rate a movie / view rating |
+| POST/GET | `/api/v1/movies/{id}/comments` | Comments with nested replies |
+| POST | `/api/v1/movies/{id}/favorite` | Add/remove from favorites |
+| GET | `/api/v1/favorites` | List favorite movies |
 
-## Запуск тестів
+## Running Tests
 
-```bash
+``````bash
 pytest app/tests -v --cov=app --cov-report=term-missing
-```
+``````
 
-76 тестів, 87% покриття (юніт + інтеграційні для всіх фіч).
+76 tests, 87% coverage (unit + integration tests across all features).
 
-## Структура проєкту
+## Project Structure
 
 app/
-├── api/v1/endpoints/   # FastAPI роутери
-├── core/               # конфігурація, security (JWT, хешування паролів)
-├── db/                 # налаштування SQLAlchemy сесії
-├── models/             # ORM-моделі
-├── schemas/            # Pydantic-схеми
-├── services/           # бізнес-логіка
+├── api/v1/endpoints/   # FastAPI routers
+├── core/               # configuration, security (JWT, password hashing)
+├── db/                 # SQLAlchemy async session setup
+├── models/             # ORM models
+├── schemas/            # Pydantic schemas
+├── services/           # business logic layer
 └── tests/
 ├── unit/
 └── integration/
 
-## Git workflow
+## Git Workflow
 
-- `main` — стабільна гілка
+- `main` — stable branch
